@@ -9,4 +9,4 @@ The default maximum word is 26
 The default file name is isograms.txt
 
 Using the wordlist.txt file in the example folder:  
-![isogrammer-v0 2](https://cloud.githubusercontent.com/assets/2692096/12510732/f85fea3e-c103-11e5-964a-945a97493fc8.png)
+![isogrammer-v0 2](https://cloud.githubusercontent.com/assets/2692096/12510757/1db8f708-c104-11e5-8641-e8d6e57c5ac6.png)
