@@ -23,7 +23,7 @@ bool compareString(const std::string& lhs, const std::string& rhs)
 	return false;
 }
 
-std::vector<std::string> extractFile(const std::string& fileName, const unsigned length)
+std::vector<std::string> extractFile(const std::string& fileName, const unsigned min, const unsigned max)
 {
 	std::vector<std::string> list;
 	std::ifstream file(fileName);
@@ -32,12 +32,12 @@ std::vector<std::string> extractFile(const std::string& fileName, const unsigned
 		for (std::string line; file >> line;)
 		{
 			std::transform(line.begin(), line.end(), line.begin(), tolower);
-			if (isIsogram(line) && line.size() >= length)
+			if (isIsogram(line) && min <= line.size() && line.size() <= max)
 				list.push_back(line);
 		}
 	}
 	else
-		throw 2;
+		throw std::runtime_error("Couldn't read from file");
 	file.close();
 	return list;
 }
@@ -51,14 +51,14 @@ void outputFile(const std::vector<std::string>& vec, const std::string& fileName
 			file << str << std::endl;
 	}
 	else
-		throw 3;
+		throw std::runtime_error("Couldn't write to file");
 	file.close();
 }
 
-void process(const std::string& inFileName, const unsigned wordLength = 4U, const std::string& outFileName = "isograms.txt")
+void process(const std::string& inFileName, const unsigned min = 4U, const unsigned max = 26U, const std::string& outFileName = "isograms.txt")
 {
 	std::cout << "Extracting isograms from the word list..." << std::endl;
-	std::vector<std::string>vec = extractFile(inFileName, wordLength);
+	std::vector<std::string>vec = extractFile(inFileName, min, max);
 	std::cout << "Sorting the list..." << std::endl;
 	std::sort(vec.begin(), vec.end(), compareString);
 	std::cout << "Writing to file..." << std::endl;
@@ -73,21 +73,15 @@ int main(int argc, char** argv)
 		if (argc < 2)
 		{
 			std::cerr << "Too few arguments\n";
-			std::cerr << "Useage: Isogrammer.exe [inputfile] OPTIONAL: [wordlength] [outputfile]\n";
-			std::cerr << "Example: Isogrammer.exe wordlist.txt 4 isograms.txt" << std::endl;
+			std::cerr << "Useage: Isogrammer.exe [inputfile] OPTIONAL: [minlength] [maxlength] [outputfile]\n";
+			std::cerr << "Example: Isogrammer.exe wordlist.txt 4 7 isograms.txt" << std::endl;
 			return EXIT_FAILURE;
 		}
-		if (argc > 4)
+		if (argc > 5)
 		{
 			std::cerr << "Too many arguments\n";
-			std::cerr << "Useage: Isogrammer.exe [inputfile] OPTIONAL: [wordlength] [outputfile]\n";
-			std::cerr << "Example: Isogrammer.exe wordlist.txt 4 isograms.txt" << std::endl;
-			return EXIT_FAILURE;
-		}
-		std::ifstream inFile(argv[1]);
-		if (!inFile.is_open())
-		{
-			std::cerr << "Error opening file " << argv[1] << std::endl;
+			std::cerr << "Useage: Isogrammer.exe [inputfile] OPTIONAL: [minlength] [maxlength] [outputfile]\n";
+			std::cerr << "Example: Isogrammer.exe wordlist.txt 4 7 isograms.txt" << std::endl;
 			return EXIT_FAILURE;
 		}
 		if (argc == 2)
@@ -95,7 +89,9 @@ int main(int argc, char** argv)
 		if (argc == 3)
 			process(argv[1], std::stoi(argv[2]));
 		if (argc == 4)
-			process(argv[1], std::stoi(argv[2]), argv[3]);
+			process(argv[1], std::stoi(argv[2]), std::stoi(argv[3]));
+		if (argc == 5)
+			process(argv[1], std::stoi(argv[2]), std::stoi(argv[3]), argv[4]);
 	}
 	catch (std::exception& e)
 	{
