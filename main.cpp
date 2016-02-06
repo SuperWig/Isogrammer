@@ -10,7 +10,7 @@ bool isIsogram(const std::string& word)
 {
 	std::unordered_set<char> hash;
 	for (auto c : word)
-		if (!hash.insert(c).second || c == ' ')
+		if (!hash.insert(c).second || c == ' ') // add c == '-' || c == '\'' if you don't want apostrophes or hypens
 			return false;
 	return true;
 }
@@ -36,7 +36,9 @@ std::set<std::string, compare> extractFile(const std::string& fileName, const un
 		for (std::string line; file >> line;)
 		{
 			std::transform(line.begin(), line.end(), line.begin(), tolower);
-			line.erase(std::remove_if(line.begin(), line.end(), [](auto c) { return !isalpha(c) && c != '\''; }), line.end()); //remove '\'' if you want don't want to keep apostrophes
+			line.erase(std::remove_if(line.begin(), line.end(), [](auto c) { return !isalpha(c) && c != '\'' && c!= '-'; }), line.end()); //keeps hypens and apostrophes
+			if (!line.empty() && line.back() == '-')
+				line.pop_back(); //remove trailing hyphens
 			if (isIsogram(line) && min <= line.size() && line.size() <= max)
 				list.insert(line);
 		}
