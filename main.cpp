@@ -36,6 +36,7 @@ std::set<std::string, compare> extractFile(const std::string& fileName, const un
 		for (std::string line; file >> line;)
 		{
 			std::transform(line.begin(), line.end(), line.begin(), tolower);
+			line.erase(std::remove_if(line.begin(), line.end(), [](auto c) { return !isalpha(c) && c != '\''; }), line.end()); //remove '\'' if you want don't want to keep apostrophes
 			if (isIsogram(line) && min <= line.size() && line.size() <= max)
 				list.insert(line);
 		}
