@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <set>
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -14,18 +15,21 @@ bool isIsogram(const std::string& word)
 	return true;
 }
 
-bool compareString(const std::string& lhs, const std::string& rhs)
+struct compare
 {
-	if (lhs.size() < rhs.size()) return true;
-	if (rhs.size() < lhs.size()) return false;
-	if (lhs < rhs) return true;
-	if (rhs < lhs) return false;
-	return false;
-}
+	bool operator()(const std::string& lhs, const std::string& rhs) const
+	{
+		if (lhs.size() < rhs.size()) return true;
+		if (rhs.size() < lhs.size()) return false;
+		if (lhs < rhs) return true;
+		if (rhs < lhs) return false;
+		return false;
+	}
+};
 
-std::vector<std::string> extractFile(const std::string& fileName, const unsigned min, const unsigned max)
+std::set<std::string, compare> extractFile(const std::string& fileName, const unsigned min, const unsigned max)
 {
-	std::vector<std::string> list;
+	std::set<std::string, compare> list;
 	std::ifstream file(fileName);
 	if (file.is_open())
 	{
@@ -33,7 +37,7 @@ std::vector<std::string> extractFile(const std::string& fileName, const unsigned
 		{
 			std::transform(line.begin(), line.end(), line.begin(), tolower);
 			if (isIsogram(line) && min <= line.size() && line.size() <= max)
-				list.push_back(line);
+				list.insert(line);
 		}
 	}
 	else
@@ -42,7 +46,7 @@ std::vector<std::string> extractFile(const std::string& fileName, const unsigned
 	return list;
 }
 
-void outputFile(const std::vector<std::string>& vec, const std::string& fileName)
+void outputFile(const std::set<std::string, compare>& vec, const std::string& fileName)
 {
 	std::ofstream file(fileName);
 	if (file.is_open())
@@ -58,9 +62,8 @@ void outputFile(const std::vector<std::string>& vec, const std::string& fileName
 void process(const std::string& inFileName, const unsigned min = 4U, const unsigned max = 26U, const std::string& outFileName = "isograms.txt")
 {
 	std::cout << "Extracting isograms from the word list..." << std::endl;
-	std::vector<std::string>vec = extractFile(inFileName, min, max);
+	std::set<std::string, compare>vec = extractFile(inFileName, min, max);
 	std::cout << "Sorting the list..." << std::endl;
-	std::sort(vec.begin(), vec.end(), compareString);
 	std::cout << "Writing to file..." << std::endl;
 	outputFile(vec, outFileName);
 	std::cout << "Finished!" << std::endl;
@@ -98,4 +101,5 @@ int main(int argc, char** argv)
 		std::cerr << "Process failed: " << e.what() << std::endl;
 		return EXIT_FAILURE;
 	}
+	return EXIT_SUCCESS;
 }
